@@ -3,6 +3,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"."
 )
 
 func TestFindDrupalRoot(t *testing.T) {
