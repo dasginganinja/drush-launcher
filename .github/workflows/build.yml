@@ -1,0 +1,87 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger the workflow when a new tag (release) is pushed
+
+jobs:
+  build_and_release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.16
+
+      - name: Build for Linux (386)
+        env:
+          GOARCH: 386
+          GOOS: linux
+        run: go build -o drush-launcher-linux-386
+
+      - name: Build for Linux (AMD64)
+        env:
+          GOARCH: amd64
+          GOOS: linux
+        run: go build -o drush-launcher-linux-amd64
+
+      - name: Build for macOS (Intel)
+        env:
+          GOARCH: amd64
+          GOOS: darwin
+        run: go build -o drush-launcher-macos-amd64
+
+      - name: Build for macOS (Apple Silicon)
+        env:
+          GOARCH: arm64
+          GOOS: darwin
+        run: go build -o drush-launcher-macos-arm64
+
+      - name: Build for Windows (386)
+        env:
+          GOARCH: 386
+          GOOS: windows
+        run: go build -o drush-launcher-windows-386.exe
+
+      - name: Build for Windows (AMD64)
+        env:
+          GOARCH: amd64
+          GOOS: windows
+        run: go build -o drush-launcher-windows-amd64.exe
+
+  create_release:
+    name: Create Release
+    needs: build_and_release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: Release of ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Assets
+        id: upload_assets
+        uses: actions/upload-artifact@v2
+        with:
+          name: mytool-assets
+          path: |
+            drush-launcher-linux-386
+            drush-launcher-linux-amd64
+            drush-launcher-macos-amd64
+            drush-launcher-macos-arm64
+            drush-launcher-windows-386.exe
+            drush-launcher-windows-amd64.exe
