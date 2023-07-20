@@ -23,37 +23,37 @@ jobs:
         env:
           GOARCH: 386
           GOOS: linux
-        run: go build -o mytool-linux-386
+        run: go build -o drush-launcher-linux-386
 
       - name: Build for Linux (AMD64)
         env:
           GOARCH: amd64
           GOOS: linux
-        run: go build -o mytool-linux-amd64
+        run: go build -o drush-launcher-linux-amd64
 
       - name: Build for macOS (Intel)
         env:
           GOARCH: amd64
           GOOS: darwin
-        run: go build -o mytool-macos-amd64
+        run: go build -o drush-launcher-macos-amd64
 
       - name: Build for macOS (Apple Silicon)
         env:
           GOARCH: arm64
           GOOS: darwin
-        run: go build -o mytool-macos-arm64
+        run: go build -o drush-launcher-macos-arm64
 
       - name: Build for Windows (386)
         env:
           GOARCH: 386
           GOOS: windows
-        run: go build -o mytool-windows-386.exe
+        run: go build -o drush-launcher-windows-386.exe
 
       - name: Build for Windows (AMD64)
         env:
           GOARCH: amd64
           GOOS: windows
-        run: go build -o mytool-windows-amd64.exe
+        run: go build -o drush-launcher-windows-amd64.exe
 
   create_release:
     name: Create Release
@@ -79,9 +79,9 @@ jobs:
         with:
           name: mytool-assets
           path: |
-            mytool-linux-386
-            mytool-linux-amd64
-            mytool-macos-amd64
-            mytool-macos-arm64
-            mytool-windows-386.exe
-            mytool-windows-amd64.exe
+            drush-launcher-linux-386
+            drush-launcher-linux-amd64
+            drush-launcher-macos-amd64
+            drush-launcher-macos-arm64
+            drush-launcher-windows-386.exe
+            drush-launcher-windows-amd64.exe
