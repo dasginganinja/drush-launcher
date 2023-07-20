@@ -1,4 +1,4 @@
-package drush_launcher_test
+package main_test
 
 import (
 	"os"
