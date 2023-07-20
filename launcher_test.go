@@ -1,5 +1,4 @@
-package drush_launcher_test
-
+package main_test
 import (
 	"os"
 	"path/filepath"
@@ -15,7 +14,7 @@ func TestFindDrupalRoot(t *testing.T) {
 	testDir1 := filepath.Join(tmpDir, "testDir1", "vendor", "bin", "drush")
 	os.MkdirAll(filepath.Dir(testDir1), os.ModePerm)
 	os.Create(testDir1)
-	drupalRoot, err := drush_launcher_test.FindDrupalRoot(testDir1)
+	drupalRoot, err := FindDrupalRoot(testDir1)
 	if err != nil || drupalRoot != filepath.Join(tmpDir, "testDir1") {
 		t.Errorf("Test case 1 failed: Expected Drupal root %s, got %s, error: %v", filepath.Join(tmpDir, "testDir1"), drupalRoot, err)
 	}
@@ -24,14 +23,14 @@ func TestFindDrupalRoot(t *testing.T) {
 	testDir2 := filepath.Join(tmpDir, "testDir2", "vendor", "bin", "drush")
 	os.MkdirAll(filepath.Dir(testDir2), os.ModePerm)
 	os.Create(testDir2)
-	drupalRoot, err = drush_launcher_test.FindDrupalRoot(testDir2)
+	drupalRoot, err = FindDrupalRoot(testDir2)
 	if err != nil || drupalRoot != filepath.Join(tmpDir, "testDir2") {
 		t.Errorf("Test case 2 failed: Expected Drupal root %s, got %s, error: %v", filepath.Join(tmpDir, "testDir2"), drupalRoot, err)
 	}
 
 	// Test case 3: Drupal root not found
 	testDir3 := filepath.Join(tmpDir, "testDir3", "some", "random", "path")
-	drupalRoot, err = drush_launcher_test.FindDrupalRoot(testDir3)
+	drupalRoot, err = FindDrupalRoot(testDir3)
 	if err == nil || drupalRoot != "" {
 		t.Errorf("Test case 3 failed: Expected no Drupal root, got %s, error: %v", drupalRoot, err)
 	}
