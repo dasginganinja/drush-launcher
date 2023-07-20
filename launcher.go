@@ -39,9 +39,6 @@ func main() {
 	flag.Parse()
 
 	var drupalRoot string
-	var err error
-
-	err = nil // to avoid issues in testing
 
 	// Use the alternative Drupal root if provided
 	if *altRoot != "" {
