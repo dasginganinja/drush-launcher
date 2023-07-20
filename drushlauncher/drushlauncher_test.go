@@ -1,4 +1,5 @@
-package main
+package drushlauncher
+
 import (
 	"os"
 	"path/filepath"
