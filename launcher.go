@@ -41,6 +41,8 @@ func main() {
 	var drupalRoot string
 	var err error
 
+	err = nil // to avoid issues in testing
+
 	// Use the alternative Drupal root if provided
 	if *altRoot != "" {
 		drupalRoot = *altRoot
