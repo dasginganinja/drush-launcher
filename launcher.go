@@ -8,63 +8,73 @@ import (
 	"path/filepath"
 )
 
-const drushExecutablePath = "vendor/bin/drush"
-
-func main() {
-	// Step 1: Parse command-line flags
-	var rootDirFlag string
-	flag.StringVar(&rootDirFlag, "root", "", "Alternative Drupal root directory")
-	flag.StringVar(&rootDirFlag, "r", "", "Alternative Drupal root directory (shorthand)")
-	flag.Parse()
-
-	// Step 2: Determine the Drupal root directory
-	drupalRoot := determineDrupalRoot(rootDirFlag)
-
-	// Step 3: Execute the drush command with arguments
-	cmd := exec.Command(determineDrushExecutable(drupalRoot), flag.Args()...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	err := cmd.Run()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func determineDrupalRoot(alternativeRoot string) string {
-	if alternativeRoot != "" {
-		// If an alternative root is provided, use it directly
-		return alternativeRoot
-	}
-
-	// If no alternative root is provided, find the Drupal root as before
-	dir, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	// Traverse upwards from the current directory to the root
-	for dir != "/" && dir != "." {
-		// Check if the drush executable exists in the current directory
-		drushPath := filepath.Join(dir, drushExecutablePath)
-		if _, err := os.Stat(drushPath); err == nil {
-			return dir
+func FindDrupalRoot(path string) (string, error) {
+	// Start traversing from the provided path to the root directory
+	currentDir := path
+	for {
+		// Check if the vendor/bin/drush directory exists in the current directory
+		drushDir := filepath.Join(currentDir, "vendor", "bin", "drush")
+		if _, err := os.Stat(drushDir); err == nil {
+			// Drupal root found, traverse one level up to get the root directory
+			drupalRoot := filepath.Dir(currentDir)
+			return drupalRoot, nil
 		}
 
-		// Move to the parent directory
-		dir = filepath.Dir(dir)
+		// Move one level up the directory tree
+		parentDir := filepath.Dir(currentDir)
+		// If we reached the root directory, stop traversing
+		if parentDir == currentDir {
+			break
+		}
+		currentDir = parentDir
 	}
 
-	// If no Drupal root is found, exit with an error message
-	fmt.Println("Drupal root not found")
-	os.Exit(1)
-	return "" // This line is never reached, but it satisfies Go's return requirements
+	// Drupal root not found in the entire directory tree
+	return "", fmt.Errorf("Drupal root not found")
 }
 
-func determineDrushExecutable(drupalRoot string) string {
-	// Build the path to the drush executable
-	return filepath.Join(drupalRoot, drushExecutablePath)
+func main() {
+	// Parse command-line flags
+	altRoot := flag.String("root", "", "Set an alternative Drupal root")
+	flag.Parse()
+
+	var drupalRoot string
+	var err error
+
+	// Use the alternative Drupal root if provided
+	if *altRoot != "" {
+		drupalRoot = *altRoot
+	} else {
+		// If no alternative root provided, find the Drupal root from the current directory
+		cwd, err := os.Getwd()
+		if err != nil {
+			fmt.Println("Error getting current directory:", err)
+			os.Exit(1)
+		}
+		drupalRoot, err = FindDrupalRoot(cwd)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
+
+	// Construct the full command to run drush
+	drushCmd := exec.Command(filepath.Join(drupalRoot, "vendor", "bin", "drush"), flag.Args()...)
+
+	// Pass the current environment variables to the drush command
+	drushCmd.Env = os.Environ()
+
+	// Set the correct working directory for the drush command
+	drushCmd.Dir = drupalRoot
+
+	// Redirect standard input/output/error for the drush command
+	drushCmd.Stdin = os.Stdin
+	drushCmd.Stdout = os.Stdout
+	drushCmd.Stderr = os.Stderr
+
+	// Run the drush command
+	if err := drushCmd.Run(); err != nil {
+		fmt.Println("Error executing drush:", err)
+		os.Exit(1)
+	}
 }
