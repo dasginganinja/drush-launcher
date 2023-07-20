@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"drushlauncher"
 )
 
 func main() {
@@ -25,7 +26,7 @@ func main() {
 			fmt.Println("Error getting current directory:", err)
 			os.Exit(1)
 		}
-		drupalRoot, err = FindDrupalRoot(cwd)
+		drupalRoot, err = drushlauncher.FindDrupalRoot(cwd)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
