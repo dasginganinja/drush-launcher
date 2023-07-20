@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"./drushlauncher"
+	"github.com/dasginganinja/drush-launcher/drushlauncher"
 )
 
 func main() {
