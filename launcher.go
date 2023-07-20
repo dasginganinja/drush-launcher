@@ -1,4 +1,4 @@
-package drush_launcher
+package main
 
 import (
 	"flag"
