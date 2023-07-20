@@ -1,3 +1,3 @@
-module drush-launcher
+module main
 
 go 1.16
