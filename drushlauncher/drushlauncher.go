@@ -7,26 +7,27 @@ import (
 )
 
 func FindDrupalRoot(path string) (string, error) {
-	// Start traversing from the provided path to the root directory
-	currentDir := path
-	for {
-		// Check if the vendor/bin/drush directory exists in the current directory
-		drushDir := filepath.Join(currentDir, "vendor", "bin", "drush")
-		if _, err := os.Stat(drushDir); err == nil {
-			// Drupal root found, traverse one level up to get the root directory
-			drupalRoot := filepath.Dir(currentDir)
-			return drupalRoot, nil
-		}
-
-		// Move one level up the directory tree
-		parentDir := filepath.Dir(currentDir)
-		// If we reached the root directory, stop traversing
-		if parentDir == currentDir {
-			break
-		}
-		currentDir = parentDir
+	// Check if the vendor/bin/drush directory exists in the current directory
+	drushDir := filepath.Join(path, "vendor", "bin", "drush")
+	if _, err := os.Stat(drushDir); err == nil {
+		// Drupal root found, return the current directory
+		return path, nil
 	}
 
-	// Drupal root not found in the entire directory tree
-	return "", fmt.Errorf("Drupal root not found")
+	// Move one level up the directory tree
+	parentDir := filepath.Dir(path)
+	if parentDir == path {
+		// If we reached the root directory, stop traversing
+		return "", fmt.Errorf("Drupal root not found")
+	}
+
+	// Check if the vendor/bin/drush directory exists in the parent directory
+	drushDir = filepath.Join(parentDir, "vendor", "bin", "drush")
+	if _, err := os.Stat(drushDir); err == nil {
+		// Drupal root found in the parent directory, return the parent directory
+		return parentDir, nil
+	}
+
+	// Recursively continue searching in the parent directory
+	return FindDrupalRoot(parentDir)
 }
