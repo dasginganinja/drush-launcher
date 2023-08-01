@@ -33,8 +33,17 @@ func main() {
 		}
 	}
 
+	// Construct the full path to the drush executable
+	drushExec := filepath.Join(drupalRoot, "vendor", "bin", "drush")
+
+	// Check if the drush executable exists
+	if _, err := os.Stat(drushExec); os.IsNotExist(err) {
+		fmt.Println("Error: Drush executable not found at", drushExec)
+		os.Exit(1)
+	}
+
 	// Construct the full command to run drush
-	drushCmd := exec.Command(filepath.Join(drupalRoot, "vendor", "bin", "drush"), flag.Args()...)
+	drushCmd := exec.Command(drushExec, flag.Args()...)
 
 	// Pass the current environment variables to the drush command
 	drushCmd.Env = os.Environ()
