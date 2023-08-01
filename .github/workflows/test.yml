@@ -22,3 +22,7 @@ jobs:
       - name: Run Tests
         run: |
           go test
+
+      - name: Run Submodule Tests
+        run: |
+          go test github.com/dasginganinja/drush-launcher/drushlauncher
