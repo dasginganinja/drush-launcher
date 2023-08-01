@@ -11,7 +11,8 @@ import (
 
 func main() {
 	// Parse command-line flags
-	altRoot := flag.String("root", "", "Set an alternative Drupal root")
+	altRoot := flag.String("r", "", "Set an alternative Drupal root")
+	altRootLong := flag.String("root", "", "Set an alternative Drupal root (long form)")
 	flag.Parse()
 
 	var drupalRoot string
@@ -19,6 +20,8 @@ func main() {
 	// Use the alternative Drupal root if provided
 	if *altRoot != "" {
 		drupalRoot = *altRoot
+	} else if *altRootLong != "" {
+		drupalRoot = *altRootLong
 	} else {
 		// If no alternative root provided, find the Drupal root from the current directory
 		cwd, err := os.Getwd()
