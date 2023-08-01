@@ -16,7 +16,6 @@ func main() {
 	flag.Parse()
 
 	var drupalRoot string
-	var err error
 
 	// Use the alternative Drupal root if provided
 	if *altRoot != "" {
