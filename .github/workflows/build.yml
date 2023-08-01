@@ -1,9 +1,9 @@
 name: goreleaser
 
 on:
-  release:
-    types:
-      - created
+  push:
+    tags:
+      - 'v*' # Trigger the w
 
 permissions:
   contents: write
