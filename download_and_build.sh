@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -eou pipefail
 
 # Define the GitHub repository owner, repository name, and binary name
 repo_owner="dasginganinja"
@@ -7,13 +9,25 @@ binary_name="drush-launcher"
 
 # Function to download the release asset from GitHub
 download_release_asset() {
-    download_url="https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}"
+    local ASSET="$1"
+    download_url="https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${ASSET}"
     echo "Downloading ${latest_release} release..."
-    curl -L -o "${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}" "$download_url"
+    curl -s -L -o "${ASSET}" "$download_url"
+
+    echo "Verifying checksum"
+    curl -s -L -o checksums.txt "https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${binary_name}_${latest_version}_checksums.txt"
+    CHECKSUM_SOURCE=$(grep "${ASSET}" checksums.txt)
+    CHECKSUM_DL=$(sha256sum ${ASSET})
+    if [ "$CHECKSUM_SOURCE" != "$CHECKSUM_DL" ]; then
+      echo "Checksums do not match."
+      rm "${ASSET}" checksums.txt
+      exit 1
+    fi
+    rm checksums.txt
 }
 
 # Check if the user specified the target architecture and OS via environment variables
-if [ -n "$GOOS" ] && [ -n "$GOARCH" ]; then
+if [ "${GOOS+1}" ] && [ "${GOARCH+1}" ]; then
     echo "Using user-specified target architecture: ${GOOS}-${GOARCH}"
 else
     # Detect the operating system
@@ -48,9 +62,9 @@ fi
 
 # Determine the binary extension based on the operating system
 if [[ "$GOOS" == "windows" ]]; then
-    binary_extension=".exe"
+    binary_extension=".zip"
 else
-    binary_extension=""
+    binary_extension=".tar.gz"
 fi
 
 # Check if the required binary for the user's architecture exists in the latest release
@@ -59,13 +73,19 @@ echo "Binary filename: " $binary_filename
 release_assets=$(curl -s "https://api.github.com/repos/${repo_owner}/${repo_name}/releases/tags/${latest_release}" | jq -r '.assets[].name')
 if [[ "$release_assets" == *"$binary_filename"* ]]; then
     echo "Binary for ${GOOS}-${GOARCH} architecture found in the latest release."
-    download_release_asset
+    download_release_asset "${binary_filename}"
+    if [[ "$GOOS" == "windows" ]]; then
+        unzip "${binary_filename}"
+    else
+        tar -zxf "${binary_filename}"
+    fi
+    rm "${binary_filename}"
 else
     echo "Binary for ${GOOS}-${GOARCH} architecture not found in the latest release. Attempting to build locally..."
-    go build -o "${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}"
+    go build -o "${binary_name}"
 fi
 
 # Make the binary executable
-chmod +x "${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}"
+chmod +x "${binary_name}"
 
-echo "The ${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension} binary is ready."
+echo "The ${binary_name} binary is ready."
