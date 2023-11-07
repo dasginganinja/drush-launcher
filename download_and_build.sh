@@ -10,15 +10,17 @@ binary_name="drush-launcher"
 # Function to download the release asset from GitHub
 download_release_asset() {
     local ASSET="$1"
-    download_url="https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${ASSET}"
     echo "Downloading ${latest_release} release..."
-    curl -s -L -o "${ASSET}" "$download_url"
+    curl -sLo "${ASSET}" \
+      "https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${ASSET}"
 
     echo "Verifying checksum"
-    curl -s -L -o checksums.txt "https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${binary_name}_${latest_version}_checksums.txt"
+    curl -sLo checksums.txt \
+      "https://github.com/${repo_owner}/${repo_name}/releases/download/${latest_release}/${binary_name}_${latest_version}_checksums.txt"
+
     CHECKSUM_SOURCE=$(grep "${ASSET}" checksums.txt)
     CHECKSUM_DL=$(sha256sum ${ASSET})
-    if [ "$CHECKSUM_SOURCE" != "$CHECKSUM_DL" ]; then
+    if [ "${CHECKSUM_SOURCE}" != "${CHECKSUM_DL}" ]; then
       echo "Checksums do not match."
       rm "${ASSET}" checksums.txt
       exit 1
