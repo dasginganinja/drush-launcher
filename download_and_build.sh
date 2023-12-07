@@ -68,4 +68,7 @@ fi
 # Make the binary executable
 chmod +x "${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}"
 
-echo "The ${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension} binary is ready."
+# Move the binary to a standard versinon with extension for system
+mv "${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension}" "${binary_name}${binary_extension}"
+
+echo "drush-launcher  ${binary_name}_${latest_version}_${GOOS}_${GOARCH}${binary_extension} and renamed to drush-launcher"
