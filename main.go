@@ -10,16 +10,9 @@ import (
 )
 
 func main() {
-	// Set up command-line flags
+	// Parse command-line flags
 	altRoot := flag.String("r", "", "Set an alternative Drupal root")
 	altRootLong := flag.String("root", "", "Set an alternative Drupal root (long form)")
-
-	// We need to pash ALL options to Drush, even those we don't set (thanks flag module :))
-	flag.CommandLine.ParseErrorsWhitelist = flag.ParseErrorsWhitelist{
-		UnknownFlags: true,
-	}
-
-	// Parse command-line flags
 	flag.Parse()
 
 	var drupalRoot string
