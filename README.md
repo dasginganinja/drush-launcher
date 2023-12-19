@@ -1,7 +1,11 @@
 # Drush Launcher - Reviving Drush Support with 💪 and ❤️
 
 ## Introduction
-🚀 Welcome to `drush-launcher`, a heartfelt tribute and robust successor to the original drush-launcher. This Go-based solution breathes new life into Drush support, especially for the long-awaited Drush 12.
+🚀 Welcome to `drush-launcher`, a heartfelt tribute and robust successor to the original drush-launcher. 
+
+The only intention for this project was to preserve a future for _system-level_ `drush` command that is able to bootstrap the the proper `drush` executable in a project.
+
+There's a space for this. Some of us need a binary in our $PATH to call from any directory, not necessarily a bash function. Some host on systems with several Drupal installations. Finally, some of us aren't running containers that are specific to our application.  Finally, it allows you to run `drush` from anywhere in your project and it knows what executable you meant to run.
 
 ## Why `drush-launcher`?
 - 💡 **Drush 12 Compatibility**: Unlike its predecessor, `drush-launcher` embraces Drush 12, ensuring your projects stay up-to-date and efficient.
