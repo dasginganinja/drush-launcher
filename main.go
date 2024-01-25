@@ -24,6 +24,8 @@ func main() {
 	flag.StringVar(&drupalRoot, "root", defaultRoot, usage)
 	flag.StringVar(&drupalRoot, "r", defaultRoot, usage + " (shorthand)")
 
+	flag.Parse()
+
 	drupalRoot, _err = drushlauncher.FindDrupalRoot(drupalRoot)
 
 	if _err != nil {
