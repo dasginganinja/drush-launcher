@@ -5,47 +5,32 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"flag"
 
 	"github.com/dasginganinja/drush-launcher/drushlauncher"
 )
 
+var drupalRoot string
+
 func main() {
-	// Parse command-line flags
-	altRoot := ""
+	defaultRoot, _err := os.Getwd()
+	const usage = "path to the Drupal root directory. Defaults to current directory."
 
-	// Strip program name from arguments before looping
-	progArgs := os.Args[1:]
-
-	for i, arg := range progArgs {
-		// If we have -r or --root we will use the next argument as the drupal root (if exists)
-		if arg == "-r" || arg == "--root" {
-			if i+1 < len(progArgs) {
-				altRoot = progArgs[i+1]
-			} else {
-				fmt.Println("Error: Missing value for root argument")
-				os.Exit(1)
-			}
-		}
+	if _err != nil {
+		fmt.Println("Error getting current working directory:", _err)
+		os.Exit(1)
 	}
 
-	var drupalRoot string
+	flag.StringVar(&drupalRoot, "root", defaultRoot, usage)
+	flag.StringVar(&drupalRoot, "r", defaultRoot, usage + " (shorthand)")
 
-	// Use the alternative Drupal root if provided
-	if altRoot != "" {
-		drupalRoot = altRoot
-	} else {
-		// If no alternative root provided, find the Drupal root from the current directory
-		cwd, err := os.Getwd()
-		if err != nil {
-			fmt.Println("Error getting current directory:", err)
-			os.Exit(1)
-		}
-		drupalRoot, err = drushlauncher.FindDrupalRoot(cwd)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	drupalRoot, _err = drushlauncher.FindDrupalRoot(drupalRoot)
+
+	if _err != nil {
+		fmt.Println(_err)
+		os.Exit(1)
 	}
+
 
 	// Construct the full path to the drush executable
 	drushExec := filepath.Join(drupalRoot, "vendor", "bin", "drush")
@@ -55,8 +40,12 @@ func main() {
 		fmt.Println("Error: Drush executable not found at", drushExec)
 		os.Exit(1)
 	}
+	
 	// Construct the full command to run drush
-	drushCmd := exec.Command(drushExec, progArgs...)
+	fmt.Println("Running drush with arguments:", flag.Args())
+	flag.Set("root", drupalRoot)
+
+	drushCmd := exec.Command(drushExec, flag.Args()...)
 
 	// Pass the current environment variables to the drush command
 	drushCmd.Env = os.Environ()
