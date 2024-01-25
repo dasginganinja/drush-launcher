@@ -33,7 +33,6 @@ func main() {
 		os.Exit(1)
 	}
 
-
 	// Construct the full path to the drush executable
 	drushExec := filepath.Join(drupalRoot, "vendor", "bin", "drush")
 
@@ -42,7 +41,7 @@ func main() {
 		fmt.Println("Error: Drush executable not found at", drushExec)
 		os.Exit(1)
 	}
-	
+
 	// Construct the full command to run drush
 	fmt.Println("Running drush with arguments:", flag.Args())
 	flag.Set("root", drupalRoot)
