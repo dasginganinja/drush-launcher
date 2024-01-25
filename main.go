@@ -43,7 +43,6 @@ func main() {
 	}
 
 	// Construct the full command to run drush
-	fmt.Println("Running drush with arguments:", flag.Args())
 	flag.Set("root", drupalRoot)
 
 	drushCmd := exec.Command(drushExec, flag.Args()...)
