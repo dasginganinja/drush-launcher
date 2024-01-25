@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/dasginganinja/drush-launcher/drushlauncher"
 )
@@ -21,10 +22,16 @@ func main() {
 		if arg == "-r" || arg == "--root" {
 			if i+1 < len(progArgs) {
 				altRoot = progArgs[i+1]
+				break // no need to loop when we find the root
 			} else {
 				fmt.Println("Error: Missing value for root argument")
 				os.Exit(1)
 			}
+		}
+		// If we have --root={altRoot}
+		if strings.HasPrefix(arg, "--root=") {
+			altRoot = strings.Replace(arg, "--root=", "", 1)
+			break // no need to loop when we find the root
 		}
 	}
 
