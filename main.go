@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"path/filepath"
-	"flag"
 
 	"github.com/dasginganinja/drush-launcher/drushlauncher"
 )
@@ -14,19 +14,29 @@ var drupalRoot string
 
 func main() {
 	defaultRoot, _err := os.Getwd()
-	const usage = "path to the Drupal root directory. Defaults to current directory."
 
 	if _err != nil {
 		fmt.Println("Error getting current working directory:", _err)
 		os.Exit(1)
 	}
 
-	flag.StringVar(&drupalRoot, "root", defaultRoot, usage)
-	flag.StringVar(&drupalRoot, "r", defaultRoot, usage + " (shorthand)")
+	// Strip program name from arguments before looping
+	progArgs := os.Args[1:]
 
-	flag.Parse()
+	for i, arg := range progArgs {
+		if arg == "-r" || arg == "--root" {
+			if i+1 < len(progArgs) {
+				defaultRoot = progArgs[i+1]
+			} else {
+				fmt.Println("Error: Missing value for root argument")
+				os.Exit(1)
+			}
+		} else if strings.HasPrefix(arg, "--root=") || strings.HasPrefix(arg, "-r=") {
+			defaultRoot = strings.Split(arg,"=")[1]
+		}
+	}
 
-	drupalRoot, _err = drushlauncher.FindDrupalRoot(drupalRoot)
+	drupalRoot, _err = drushlauncher.FindDrupalRoot(defaultRoot)
 
 	if _err != nil {
 		fmt.Println(_err)
@@ -42,10 +52,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Construct the full command to run drush
-	flag.Set("root", drupalRoot)
-
-	drushCmd := exec.Command(drushExec, flag.Args()...)
+	drushCmd := exec.Command(drushExec, progArgs...)
 
 	// Pass the current environment variables to the drush command
 	drushCmd.Env = os.Environ()
