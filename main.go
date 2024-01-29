@@ -58,7 +58,6 @@ func main() {
 	// Parse the composer.json to get the bin-dir flag.
 	// If no bin-dir flag is found, or no composer.json file use the default vendor/bin
 	var drushRoot = filepath.Join("vendor", "bin")
-
 	if (drushlauncher.GetComposerBinDir(drupalRoot) != "") {
 		drushRoot = drushlauncher.GetComposerBinDir(drupalRoot)
 	}
