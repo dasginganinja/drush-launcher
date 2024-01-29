@@ -56,8 +56,9 @@ func main() {
 
 	// Construct the full path to the drush executable
 	// Parse the composer.json to get the bin-dir flag.
-	// If no bin-dir flag is found, use the default vendor/bin
-	drushExec := filepath.Join(drupalRoot, drushlauncher.GetComposerBinDir(drupalRoot), "drush")
+	// If no bin-dir flag is found, or no composer.json file use the default vendor/bin
+	var drushRoot = drushlauncher.GetComposerBinDir(drupalRoot) ? drushlauncher.GetComposerBinDir(drupalRoot) : filepath.Join("vendor", "bin")
+	drushExec := filepath.Join(drupalRoot, drushRoot, "drush")
 
 	// Check if the drush executable exists
 	if _, err := os.Stat(drushExec); os.IsNotExist(err) {

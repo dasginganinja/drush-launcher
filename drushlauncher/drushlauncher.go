@@ -51,7 +51,7 @@ func FindDrupalRoot(path string) (string, error) {
 func GetComposerBinDir(path string) string {
 	composerJsonPath := filepath.Join(path, "composer.json")
 
-	// Check if composer.json and composer.json exist
+	// Check if composer.json exist
 	if _, err := os.Stat(composerJsonPath); os.IsNotExist(err) {
 		return ""
 	}
