@@ -53,13 +53,16 @@ func GetComposerBinDir(path string) string {
 
 	// Check if composer.json exist
 	if _, err := os.Stat(composerJsonPath); os.IsNotExist(err) {
-		return ""
+		// No way to find the bin-dir flag, return the default vendor/bin
+		return filepath.Join("vendor", "bin")
 	}
 	composerJsonFile, err := os.Open(composerJsonPath)
 
 	// Check if we can open composer.json
 	if err != nil {
 		fmt.Println("Error opening composer.json:", err)
+		// Here we return blank because we know there's a file but we can't read
+		// it, so we can't check for the the bin-dir flag.
 		return ""
 	}
 
