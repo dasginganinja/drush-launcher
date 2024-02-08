@@ -96,7 +96,7 @@ func GetComposerBinDir(path string) string {
 	// Check if the bin-dir flag exists
 	if composerJsonValues.Config.BinDir == "" {
 		// If the bin-dir flag does not exist, use the default vendor/bin
-		return filepath.Join("vendor", "bin")
+		return filepath.Join(dirPath, "vendor", "bin")
 	}
 
 	// If the bin-dir flag exists, use the value of the flag
