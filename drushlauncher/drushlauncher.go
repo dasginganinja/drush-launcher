@@ -49,13 +49,30 @@ func FindDrupalRoot(path string) (string, error) {
 }
 
 func GetComposerBinDir(path string) string {
-	composerJsonPath := filepath.Join(path, "composer.json")
+	var dirPath = "";
+	var composerJsonPath = filepath.Join(path, dirPath, "composer.json")
+	var composerFound = false
 
 	// Check if composer.json exist
 	if _, err := os.Stat(composerJsonPath); os.IsNotExist(err) {
-		// No way to find the bin-dir flag, return the default vendor/bin
-		return filepath.Join("vendor", "bin")
+		// Check one directory up in case Drupal webroot is in a subdirectory.
+		composerFound = false;
+	} else {
+		composerFound = true;
 	}
+
+	// Check the parent directory.
+	if !composerFound {
+		dirPath = ".."
+		composerJsonPath = filepath.Join(path, dirPath, "composer.json")
+		if _, err := os.Stat(composerJsonPath); os.IsNotExist(err) {
+			// No way to find the bin-dir flag, return the default vendor/bin
+			return filepath.Join("vendor", "bin")
+		} else {
+			composerFound = true;
+		}
+	}
+
 	composerJsonFile, err := os.Open(composerJsonPath)
 
 	// Check if we can open composer.json
@@ -83,7 +100,7 @@ func GetComposerBinDir(path string) string {
 	}
 
 	// If the bin-dir flag exists, use the value of the flag
-	binDir := filepath.Join(composerJsonValues.Config.BinDir)
+	binDir := filepath.Join(dirPath, composerJsonValues.Config.BinDir)
 
 	return binDir
 }

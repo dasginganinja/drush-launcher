@@ -61,7 +61,6 @@ func main() {
 	if (drushlauncher.GetComposerBinDir(drupalRoot) != "") {
 		drushRoot = drushlauncher.GetComposerBinDir(drupalRoot)
 	}
-
 	drushExec := filepath.Join(drupalRoot, drushRoot, "drush")
 
 	// Check if the drush executable exists
