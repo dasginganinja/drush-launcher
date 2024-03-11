@@ -39,7 +39,12 @@ func main() {
 
 	// Use the alternative Drupal root if provided
 	if altRoot != "" {
-		drupalRoot = altRoot
+		var err error
+		drupalRoot, err = drushlauncher.FindDrushExecutable(altRoot)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	} else {
 		// If no alternative root provided, find the Drupal root from the current directory
 		cwd, err := os.Getwd()
@@ -47,7 +52,7 @@ func main() {
 			fmt.Println("Error getting current directory:", err)
 			os.Exit(1)
 		}
-		drupalRoot, err = drushlauncher.FindDrupalRoot(cwd)
+		drupalRoot, err = drushlauncher.FindDrushExecutable(cwd)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

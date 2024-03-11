@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-func FindDrupalRoot(path string) (string, error) {
+func FindDrushExecutable(path string) (string, error) {
 	// Check if the vendor/bin/drush directory exists in the current directory
 	drushDir := filepath.Join(path, "vendor", "bin", "drush")
 	if _, err := os.Stat(drushDir); err == nil {
@@ -29,5 +29,5 @@ func FindDrupalRoot(path string) (string, error) {
 	}
 
 	// Recursively continue searching in the parent directory
-	return FindDrupalRoot(parentDir)
+	return FindDrushExecutable(parentDir)
 }
