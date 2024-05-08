@@ -36,6 +36,11 @@ func main() {
 	}
 
 	var drupalRoot string
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		os.Exit(1)
+	}
 
 	// Use the alternative Drupal root if provided
 	if altRoot != "" {
@@ -47,11 +52,6 @@ func main() {
 		}
 	} else {
 		// If no alternative root provided, find the Drupal root from the current directory
-		cwd, err := os.Getwd()
-		if err != nil {
-			fmt.Println("Error getting current directory:", err)
-			os.Exit(1)
-		}
 		drupalRoot, err = drushlauncher.FindDrushExecutable(cwd)
 		if err != nil {
 			fmt.Println(err)
@@ -74,7 +74,7 @@ func main() {
 	drushCmd.Env = os.Environ()
 
 	// Set the correct working directory for the drush command
-	drushCmd.Dir = drupalRoot
+	drushCmd.Dir = cwd
 
 	// Redirect standard input/output/error for the drush command
 	drushCmd.Stdin = os.Stdin
